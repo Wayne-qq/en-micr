@@ -73,6 +73,9 @@
 
         function speakText(text) {
             const speech = new SpeechSynthesisUtterance(text);
+            speech.onend = function() {
+                setTimeout(() => recognition.start(), 500); // Після озвучування знову активуємо мікрофон
+            };
             speech.lang = "en-US";
             window.speechSynthesis.speak(speech);
         }
