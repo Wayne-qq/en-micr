@@ -41,7 +41,6 @@
 
 
 
-</script>
     <script>
         const spokenText = document.getElementById("spokenText");
         const translatedText = document.getElementById("translatedText");
@@ -52,12 +51,12 @@
 
         function startRecognition() {
             recognition.start();
+            recognition.onend = function() {
+                setTimeout(() => recognition.start(), 500); // Для безперервного зчитування на iOS
+            };
         }
 
         recognition.onresult = function(event) {
-    recognition.onend = function() {
-        recognition.start(); // Автоматично продовжуємо зчитування
-    };
             const transcript = event.results[0][0].transcript;
             spokenText.innerText = transcript;
             translateText(transcript);
