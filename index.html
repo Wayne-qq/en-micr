@@ -38,26 +38,33 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-
-
-
     <script>
         const spokenText = document.getElementById("spokenText");
         const translatedText = document.getElementById("translatedText");
 
+        // Перевірка підтримки SpeechRecognition на пристрої
+        if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+            alert("Ваша версія браузера не підтримує голосове зчитування.");
+        }
+
         const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.lang = "uk-UA";
         recognition.interimResults = false;
+        recognition.continuous = true; // Включаємо неперервне зчитування
 
         function startRecognition() {
             recognition.start();
+            recognition.onstart = function() {
+                console.log("Голосове зчитування розпочато...");
+            };
             recognition.onend = function() {
+                console.log("Голосове зчитування завершено.");
                 setTimeout(() => recognition.start(), 500); // Для безперервного зчитування на iOS
             };
         }
 
         recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript;
+            const transcript = event.results[event.resultIndex][0].transcript;
             spokenText.innerText = transcript;
             translateText(transcript);
         };
@@ -73,9 +80,6 @@
 
         function speakText(text) {
             const speech = new SpeechSynthesisUtterance(text);
-            speech.onend = function() {
-                setTimeout(() => recognition.start(), 500); // Після озвучування знову активуємо мікрофон
-            };
             speech.lang = "en-US";
             window.speechSynthesis.speak(speech);
         }
